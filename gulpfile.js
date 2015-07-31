@@ -42,6 +42,8 @@ gulp.task('default', function() {
     return gulp.src(fileList)
     .pipe(plugins.jshint())
     .pipe(plugins.concat('omui.js'))
+    .pipe(gulp.dest("build"))
     .pipe(plugins.uglify())
+    .pipe(plugins.rename("omui.min.js"))
     .pipe(gulp.dest('build'));
 });

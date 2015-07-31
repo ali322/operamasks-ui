@@ -85,7 +85,7 @@ $.omWidget("om.omDialog", {
          *   $("#select").omDialog({autoOpen : true});
          */
 		autoOpen: true,
-		
+		url:'',
 		/**
          * 对话框中的按钮。此配置项为JSON数组。每个JSON对象具有 <code>text</code> 属性(配置按钮文字)
          * 和 <code>click</code> 属性配置按钮触发时的回调方法。
@@ -392,6 +392,11 @@ $.omWidget("om.omDialog", {
             iframeEl.attr('src',iframeElSrc);
             iframeEl.removeData('src');
             //   iframeEl.removeAttr('loadsrc');
+        }
+        if(this.options.url !==""){
+        	$.get(this.options.url,function(resp){
+        		this.element.html(resp);
+        	});
         }
 		if ( this.options.autoOpen ) {
 			this.open();
