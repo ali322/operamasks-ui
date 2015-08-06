@@ -4616,6 +4616,10 @@ $.extend($.om.sortable, {
              * $('.selector').omGrid({limit : 15});
              */
             limit:15,
+            /*
+             * 是否显示分页             
+             */
+            showPagination:true,
             /**
              * 显示在分页条上“上一页”和“下一页”按钮之间的文字。在显示时其中的{totalPage}会被替换为总页数，{index}会被替换为一个输入框（默认显示当前的页号，用户可以输入任意数字然后回车来跳转到指定的页）。
              * @name omGrid#pageText
@@ -17072,148 +17076,149 @@ $.omWidget("om.omProgressbar", {
  *  om-core.js
  */
 /**
-     * @name omTree
-     * @class 树型组件<br/><br/>
-     * treenode 支持两种json格式。<br/>
-     * 第一种为：<br/>
-     * <pre>
-     * {
-     *     text:'node1', // 树节点显示文本，必需
-     *     expanded:true, // 是否默认展开，非必须，默认值是false
-     *     classes:'folder', // 树节点样式，非必需，默认有folder和file，如果用户自定制为其他，则显示用户自定义样式
-     *     children:childrenDataArray, //子节点，非必需。缓加载时可以没有这个属性 
-     *     hasChildren: false // 是否有子节点，非必需，如果值为true表示要缓加载此时可以没有children属性
-     * } 
-     * </pre>
-     * 第二种为：<br/>
-     * <pre>
-     * {
-     *     id:'n1', //树节点的标识，必需
-     *     pid: 'n0' //父节点id，非必需，如果没有设置该节点就为根节点
-     *     text:'node1', // 树节点显示文本，必需
-     *     expanded:true, // 是否默认展开，非必须，默认值是false
-     *     classes:'folder' // 树节点样式，非必需，默认有folder和file，如果用户自定制为其他，则显示用户自定义样式
-     * } 
-     * </pre>
-     * 注意：如果使用第二中json格式，需要将simpleDataModel属性值设置为true。
-     * omTree为每个节点自动生成的唯一标识nid，生成规则为treeId+ "_" + 计数，请用户在omTree的页面上避免
-     * 使用此种规则定义其他对象的nid。不需要用户进行初始化，属于内部参数。
-     * <br/>
-     * <b>特点：</b><br/>
-     * <ol>
-     *      <li>可以使用本地数据源，也可以使用远程数据源</li>
-     *      <li>支持数据的缓加载（开始取数时不取子节点数据，第一次展开时才开始向后台取数）</li>
-     *      <li>提供丰富的事件</li>
-     * </ol>
-     * 
-     * <b>示例：</b><br/>
-     * <pre>
-     * &lt;script type="text/javascript" >
-     * var data = 
-     *       [{
-     *           "text": "1. Review of existing structures",
-     *           "children":[{
-     *               "text": "1.1 jQuery core"
-     *           }]
-     *       }, {
-     *           "text": "2. Wrapper plugins",
-     *           "expanded": true,
-     *           "children":[{
-     *               "text":"2.1 wrapper tips",
-     *               "expanded": true,
-     *               "children": [{
-     *                   "text":"2.1.1 wrapper loader tips"
-     *               },{
-     *                   "text":"2.1.2 wrapper runder tips"
-     *               }]
-     *           },{
-     *               "text":"2.2 tree nodes"
-     *           }]
-     *       }, {
-     *           "text": "3. Summary"
-     *       }, {
-     *           "text": "4. Questions and answers"
-     *       }];
-     *   $(document).ready(function(){
-     *       $("#mytree").omTree({
-     *           dataSource : data
-     *       });
-     *   });
-     * &lt;/script>
-     * 
-     * &lt;ul id="mytree"/>
-     * </pre>
-     * 
-     * @constructor
-     * @description 构造函数. 
-     * @param options 标准options对象：{}
-     */
-;(function($) {
+ * @name omTree
+ * @class 树型组件<br/><br/>
+ * treenode 支持两种json格式。<br/>
+ * 第一种为：<br/>
+ * <pre>
+ * {
+ *     text:'node1', // 树节点显示文本，必需
+ *     expanded:true, // 是否默认展开，非必须，默认值是false
+ *     classes:'folder', // 树节点样式，非必需，默认有folder和file，如果用户自定制为其他，则显示用户自定义样式
+ *     children:childrenDataArray, //子节点，非必需。缓加载时可以没有这个属性 
+ *     hasChildren: false // 是否有子节点，非必需，如果值为true表示要缓加载此时可以没有children属性
+ * } 
+ * </pre>
+ * 第二种为：<br/>
+ * <pre>
+ * {
+ *     id:'n1', //树节点的标识，必需
+ *     pid: 'n0' //父节点id，非必需，如果没有设置该节点就为根节点
+ *     text:'node1', // 树节点显示文本，必需
+ *     expanded:true, // 是否默认展开，非必须，默认值是false
+ *     classes:'folder' // 树节点样式，非必需，默认有folder和file，如果用户自定制为其他，则显示用户自定义样式
+ * } 
+ * </pre>
+ * 注意：如果使用第二中json格式，需要将simpleDataModel属性值设置为true。
+ * omTree为每个节点自动生成的唯一标识nid，生成规则为treeId+ "_" + 计数，请用户在omTree的页面上避免
+ * 使用此种规则定义其他对象的nid。不需要用户进行初始化，属于内部参数。
+ * <br/>
+ * <b>特点：</b><br/>
+ * <ol>
+ *      <li>可以使用本地数据源，也可以使用远程数据源</li>
+ *      <li>支持数据的缓加载（开始取数时不取子节点数据，第一次展开时才开始向后台取数）</li>
+ *      <li>提供丰富的事件</li>
+ * </ol>
+ * 
+ * <b>示例：</b><br/>
+ * <pre>
+ * &lt;script type="text/javascript" >
+ * var data = 
+ *       [{
+ *           "text": "1. Review of existing structures",
+ *           "children":[{
+ *               "text": "1.1 jQuery core"
+ *           }]
+ *       }, {
+ *           "text": "2. Wrapper plugins",
+ *           "expanded": true,
+ *           "children":[{
+ *               "text":"2.1 wrapper tips",
+ *               "expanded": true,
+ *               "children": [{
+ *                   "text":"2.1.1 wrapper loader tips"
+ *               },{
+ *                   "text":"2.1.2 wrapper runder tips"
+ *               }]
+ *           },{
+ *               "text":"2.2 tree nodes"
+ *           }]
+ *       }, {
+ *           "text": "3. Summary"
+ *       }, {
+ *           "text": "4. Questions and answers"
+ *       }];
+ *   $(document).ready(function(){
+ *       $("#mytree").omTree({
+ *           dataSource : data
+ *       });
+ *   });
+ * &lt;/script>
+ * 
+ * &lt;ul id="mytree"/>
+ * </pre>
+ * 
+ * @constructor
+ * @description 构造函数. 
+ * @param options 标准options对象：{}
+ */
+;
+(function($) {
     /**
      * treenode: { text:'node1', expanded:true}
      */
-    
-    var CLASSES =  {
-            open: "open",
-            closed: "closed",
-            expandable: "expandable",
-            expandableHitarea: "expandable-hitarea",
-            lastExpandableHitarea: "lastExpandable-hitarea",
-            collapsable: "collapsable",
-            collapsableHitarea: "collapsable-hitarea",
-            lastCollapsableHitarea: "lastCollapsable-hitarea",
-            lastCollapsable: "lastCollapsable",
-            lastExpandable: "lastExpandable",
-            last: "last",
-            hitarea: "hitarea"
-        };
-    
+
+    var CLASSES = {
+        open: "open",
+        closed: "closed",
+        expandable: "expandable",
+        expandableHitarea: "expandable-hitarea",
+        lastExpandableHitarea: "lastExpandable-hitarea",
+        collapsable: "collapsable",
+        collapsableHitarea: "collapsable-hitarea",
+        lastCollapsableHitarea: "lastCollapsable-hitarea",
+        lastCollapsable: "lastCollapsable",
+        lastExpandable: "lastExpandable",
+        last: "last",
+        hitarea: "hitarea"
+    };
+
     $.omWidget("om.omTree", {
         _swapClass: function(target, c1, c2) {
             var c1Elements = target.filter('.' + c1);
             target.filter('.' + c2).removeClass(c2).addClass(c1);
             c1Elements.removeClass(c1).addClass(c2);
         },
-        
+
         /**
          * target: treenode LI DOM 
          */
-        _getParentNode :function (target){
-            if(target){
+        _getParentNode: function(target) {
+            if (target) {
                 var $pnode = $(target).parent().parent();
-                if($pnode && $pnode.hasClass("om-tree-node")) {
+                if ($pnode && $pnode.hasClass("om-tree-node")) {
                     return $pnode;
                 }
             }
             return null;
         },
-        
-        _setParentCheckbox: function (node){
+
+        _setParentCheckbox: function(node) {
             var pnode = this._getParentNode(node);
-            if (pnode){
+            if (pnode) {
                 var checkbox = pnode.find(">ul >li >div.tree-checkbox");
                 var allChild = checkbox.length;
                 var full_len = checkbox.filter(".checkbox_full").length;
                 var part_len = checkbox.filter(".checkbox_part").length;
-                var pnode_checkbox = pnode.find(">div.tree-checkbox"); 
+                var pnode_checkbox = pnode.find(">div.tree-checkbox");
                 pnode_checkbox.removeClass("checkbox_full checkbox_part checkbox_checked");
-                if(full_len == allChild) {
+                if (full_len == allChild) {
                     pnode_checkbox.addClass("checkbox_full checkbox_checked");
-                } else if(full_len > 0 || part_len > 0) {
+                } else if (full_len > 0 || part_len > 0) {
                     pnode_checkbox.addClass("checkbox_part checkbox_checked");
                 }
                 this._setParentCheckbox(pnode);
             }
         },
-        
-        _setChildCheckbox : function (node, checked){
+
+        _setChildCheckbox: function(node, checked) {
             var childck = node.find(">ul").find('.tree-checkbox');
             childck.removeClass("checkbox_part checkbox_full checkbox_checked");
-            if(checked) {
+            if (checked) {
                 childck.addClass("checkbox_full checkbox_checked");
             }
         },
-        
+
         // target equal the li elements
         _applyEvents: function(target) {
             var self = this,
@@ -17221,109 +17226,110 @@ $.omWidget("om.omProgressbar", {
                 onClick = options.onClick,
                 onDblClick = options.onDblClick,
                 onRightClick = options.onRightClick,
-                onDrag =options.onDrag,
-//                onSelect = options.onSelect,
+                onDrag = options.onDrag,
+                //                onSelect = options.onSelect,
                 onDrop = options.onDrop;
-            target.find("span").bind("click",function(e){
-            	var node = self.element.data("nodes")[$(this).parent().attr("id")];
-           	    onClick && self._trigger("onClick",e,node);
+            target.find("span").bind("click", function(e) {
+                var node = self.element.data("nodes")[$(this).parent().attr("id")];
+                onClick && self._trigger("onClick", e, node);
                 self.select(node);
                 return false;
-            }).bind("dblclick", function(e){
-            	var nDom = $(this).parent();
+            }).bind("dblclick", function(e) {
+                var nDom = $(this).parent();
                 var node = self.element.data("nodes")[nDom.attr("id")];
-                if(nDom.hasClass("hasChildren")){
-                	nDom.find("span.folder")
-            		.removeClass("folder").addClass("placeholder");
-            	}
-                if ( nDom.has("ul").length >0 && $(e.target, this) )
+                if (nDom.hasClass("hasChildren")) {
+                    nDom.find("span.folder")
+                        .removeClass("folder").addClass("placeholder");
+                }
+                if (nDom.has("ul").length > 0 && $(e.target, this))
                     self.toggler(nDom);
                 nDom.find("span.placeholder").removeClass("placeholder").addClass("folder");
-                onDblClick && self._trigger("onDblClick",e,node);
-            }).bind("contextmenu", function(e){
-                     var node = self.element.data("nodes")[$(this).parent().attr("id")];
-                     onRightClick && self._trigger("onRightClick",e,node);
-            }).bind("mouseover mouseout", function(e){
-                      if(e.type == "mouseover"){
-                          $(this).addClass("hover");
-                      }
-                      else if(e.type == "mouseout"){
-                          $(this).removeClass("hover");
-                      }
-                      return false;
+                onDblClick && self._trigger("onDblClick", e, node);
+            }).bind("contextmenu", function(e) {
+                var node = self.element.data("nodes")[$(this).parent().attr("id")];
+                onRightClick && self._trigger("onRightClick", e, node);
+            }).bind("mouseover mouseout", function(e) {
+                if (e.type == "mouseover") {
+                    $(this).addClass("hover");
+                } else if (e.type == "mouseout") {
+                    $(this).removeClass("hover");
+                }
+                return false;
             });
             self._bindHitEvent(target);
-			
-			 target.find("div.tree-checkbox").click(function(e){
+
+            target.find("div.tree-checkbox").click(function(e) {
                 var node = $(this).parent();
                 var nodedata = self.findByNId(node.attr("id"));
-/*                if(nodedata.children && options.cascadeCheck === false){
-                	return;
-                }*/
+                /*                if(nodedata.children && options.cascadeCheck === false){
+                                    return;
+                                }*/
                 self._toggleCheck(node, self.isCheck(nodedata));
             });
             if (self.options.draggable) {
                 target.omDraggable({
                     revert: "invalid",
-                    onStart: function(ui,e) {
-                    	var node = self.findByNId(ui.helper.attr("id"));
-                        onDrag && self._trigger("onDrag",e,node);
+                    onStart: function(ui, e) {
+                        var node = self.findByNId(ui.helper.attr("id"));
+                        onDrag && self._trigger("onDrag", e, node);
                     }
                 });
                 target
-                .omDroppable({
-                	greedy : true,
-                    accept : "li.om-tree-node",
-                    onDragOver: function(source, event){
-                    	var nodes = target.filter(".treenode-droppable");
-                    	if(nodes.length > 0){
-                    		nodes.removeClass("treenode-droppable");
-                    	}else{
-                    		$(this).addClass("treenode-droppable");
-                    	}
-                    },
-                    onDragOut: function(source,event){
-                    	$(this).removeClass("treenode-droppable");
-                    },
-                    onDrop : function(source, event) {
-                        var pnode = null,bnode = null,$item = source;
-                        var $drop = this;
-//                        var $list = $drop.find(">ul");
-                        $(this).removeClass("treenode-droppable");
-                        $item.css("left", "");
-                        $item.css("top", "");
-                        var drop = self.findByNId($drop.attr("id"));
-                        var dragnode = self.findByNId($item.attr("id"));
-                        if($drop.has("ul").length > 0){
-                           pnode = drop;
-                        }else{
-                           bnode = drop; 
-                           dragnode.pid = drop.pid;
+                    .omDroppable({
+                        greedy: true,
+                        accept: "li.om-tree-node",
+                        onDragOver: function(source, event) {
+                            var nodes = target.filter(".treenode-droppable");
+                            if (nodes.length > 0) {
+                                nodes.removeClass("treenode-droppable");
+                            } else {
+                                $(this).addClass("treenode-droppable");
+                            }
+                        },
+                        onDragOut: function(source, event) {
+                            $(this).removeClass("treenode-droppable");
+                        },
+                        onDrop: function(source, event) {
+                            var pnode = null,
+                                bnode = null,
+                                $item = source;
+                            var $drop = this;
+                            //                        var $list = $drop.find(">ul");
+                            $(this).removeClass("treenode-droppable");
+                            $item.css("left", "");
+                            $item.css("top", "");
+                            var drop = self.findByNId($drop.attr("id"));
+                            var dragnode = self.findByNId($item.attr("id"));
+                            if ($drop.has("ul").length > 0) {
+                                pnode = drop;
+                            } else {
+                                bnode = drop;
+                                dragnode.pid = drop.pid;
+                            }
+                            var node = self.findByNId($item.parent().find("li").attr("id"));
+                            self.remove(dragnode);
+                            self.insert(dragnode, pnode, bnode, true);
+                            onDrop && self._trigger("onDrop", event, node);
                         }
-                        var node = self.findByNId($item.parent().find("li").attr("id"));
-                        self.remove(dragnode);
-                        self.insert(dragnode, pnode, bnode, true);
-                        onDrop && self._trigger("onDrop",event,node);
-                    }
-                });
+                    });
             }
-            target.bind("mousedown", function(e){
-                e.stopPropagation();                
+            target.bind("mousedown", function(e) {
+                e.stopPropagation();
             });
         },
-        _bindHitEvent: function(target){
-        	var self=this;
-        	target.find("div.hitarea").click(function() {
+        _bindHitEvent: function(target) {
+            var self = this;
+            target.find("div.hitarea").click(function() {
                 var node = $(this).parent();
-                if(node.hasClass("hasChildren")){
-            		node.find("span.folder")
-            		.removeClass("folder").addClass("placeholder");
-            	}
+                if (node.hasClass("hasChildren")) {
+                    node.find("span.folder")
+                        .removeClass("folder").addClass("placeholder");
+                }
                 self.toggler(node);
                 node.find("span.placeholder").removeClass("placeholder").addClass("folder");
             });
         },
-        options: /** @lends omTree#*/{
+        options: /** @lends omTree#*/ {
             /* 暂不支持
              * 树初始状态时展开的层级.
              * @type Number
@@ -17428,7 +17434,7 @@ $.omWidget("om.omProgressbar", {
             filter: null,
             // before refresh the node ,you can change the node
             // nodeFomatter:null,
-            nodeCount:0,
+            nodeCount: 0,
             /**
              * 数据源是否为简单数据模型。
              * @type Boolean
@@ -17440,26 +17446,27 @@ $.omWidget("om.omProgressbar", {
         },
         _create: function() {
             this.element.data("nodes", [])
-                    .data("selected", "").data("init_dataSource", [])
-                    .addClass("om-tree om-widget");
+                .data("selected", "").data("init_dataSource", [])
+                .addClass("om-tree om-widget");
         },
-       
+
         updateNode: function(target) {
-            var self = this, options = self.options;
+            var self = this,
+                options = self.options;
             // prepare branches and find all tree items with child lists
             var branches = target.find("li");
             //.prepareBranches(options);
-            
+
             //self._applyClasses(branches);
             self._applyEvents(branches);
-            
-            if(options.control) {
+
+            if (options.control) {
                 self._treeController(self, options.control);
             }
         },
-        
-        
-        
+
+
+
         // handle toggle event
         // change the target to the treenode (li dom)
         toggler: function(target) {
@@ -17468,86 +17475,87 @@ $.omWidget("om.omProgressbar", {
             var nid = target.attr("id");
             var node = self.findByNId(nid);
             var hidden = target.hasClass(CLASSES.expandable);
-            
-            if ( hidden ) {
+
+            if (hidden) {
                 var onBeforeExpand = options.onBeforeExpand;
-                if(onBeforeExpand && false === self._trigger("onBeforeExpand",null,node)){
+                if (onBeforeExpand && false === self._trigger("onBeforeExpand", null, node)) {
                     return self;
                 }
             } else {
                 var onBeforeCollapse = options.onBeforeCollapse;
-                if(onBeforeCollapse && false === self._trigger("onBeforeCollapse",null,node)){
+                if (onBeforeCollapse && false === self._trigger("onBeforeCollapse", null, node)) {
                     return self;
                 }
             }
-            
+
             // swap classes for hitarea
-            var hitarea = target.find( target.find(">.hitarea") );
+            var hitarea = target.find(target.find(">.hitarea"));
             self._swapClass(hitarea, CLASSES.collapsableHitarea, CLASSES.expandableHitarea);
             self._swapClass(hitarea, CLASSES.lastCollapsableHitarea, CLASSES.lastExpandableHitarea);
-            
+
             // swap classes for li
             self._swapClass(target, CLASSES.collapsable, CLASSES.expandable);
             self._swapClass(target, CLASSES.lastCollapsable, CLASSES.lastExpandable);
-            
+
             // find child lists
-            target.find( ">ul" )
-                .each(function(){
-                    if ( hidden ) {
+            target.find(">ul")
+                .each(function() {
+                    if (hidden) {
                         $(this).show();
                         var onExpand = options.onExpand;
-                        onExpand && self._trigger("onExpand",null,node);
+                        onExpand && self._trigger("onExpand", null, node);
                     } else {
                         $(this).hide();
                         var onCollapse = options.onCollapse;
-                        onCollapse && self._trigger("onCollapse",null,node);
+                        onCollapse && self._trigger("onCollapse", null, node);
                     }
                 });
         },
-        
+
         _init: function() {
-            var self = this, options = self.options,
+            var self = this,
+                options = self.options,
                 target = self.element,
                 source = options.dataSource;
             target.empty();
-            if(source) {
-                if(typeof source == 'string'){
+            if (source) {
+                if (typeof source == 'string') {
                     self._ajaxLoad(target, source);
-                }else if(typeof source == 'object'){
-                	if(options.simpleDataModel){
-                		source = self._transformToNodes(source);
-                	}
-                	target.data("init_dataSource", source);
+                } else if (typeof source == 'object') {
+                    if (options.simpleDataModel) {
+                        source = self._transformToNodes(source);
+                    }
+                    target.data("init_dataSource", source);
                     self._appendNodes.apply(self, [target, source]);
                     self.updateNode(target);
-                    options.onSuccess && self._trigger("onSuccess",null,source);
+                    options.onSuccess && self._trigger("onSuccess", null, source);
                 }
             }
         },
-        
-        _ajaxLoad:function(target, url){
+
+        _ajaxLoad: function(target, url) {
             var self = this,
                 options = this.options,
                 onBeforeLoad = options.onBeforeLoad,
                 onSuccess = options.onSuccess,
                 onError = options.onError;
-            onBeforeLoad && self._trigger("onBeforeLoad",null,self.findByNId(target.parent().attr("id")));
+            onBeforeLoad && self._trigger("onBeforeLoad", null, self.findByNId(target.parent().attr("id")));
             $.ajax({
                 url: url,
                 method: 'POST',
                 dataType: 'json',
                 cache: false,
-                success: function(data){
-                	if(options.simpleDataModel){
-                		data = self._transformToNodes(data);
-                	}
-                	target.data("init_dataSource", data);
+                success: function(data) {
+                    if (options.simpleDataModel) {
+                        data = self._transformToNodes(data);
+                    }
+                    target.data("init_dataSource", data);
                     self._appendNodes.apply(self, [target, data]);
                     self.updateNode(target);
-                    onSuccess && self._trigger("onSuccess",null,data);
+                    onSuccess && self._trigger("onSuccess", null, data);
                 },
-                error: function(XMLHttpRequest, textStatus, errorThrown){
-                    onError && self._trigger("onError",null,XMLHttpRequest, textStatus, errorThrown);
+                error: function(XMLHttpRequest, textStatus, errorThrown) {
+                    onError && self._trigger("onError", null, XMLHttpRequest, textStatus, errorThrown);
                 }
             });
         },
@@ -17561,9 +17569,9 @@ $.omWidget("om.omProgressbar", {
          * //将target节点的勾选状态设置为被勾选状态
          * var target = $('#myTree').omTree("findNode", "text", "node1");
          * $('#myTree').omTree('check',target);
-         */  
+         */
         check: function(target) {
-	            this._toggleCheck($("#" + target.nid), false);
+            this._toggleCheck($("#" + target.nid), false);
         },
         /**
          * 将指定节点前的勾选框设置为未被勾选状态，该方法只有在属性showCheckbox为true时才生效。
@@ -17574,29 +17582,30 @@ $.omWidget("om.omProgressbar", {
          * //将target节点的勾选状态设置为不被勾选状态
          * var target = $('#myTree').omTree("findNode", "text", "node1");
          * $('#myTree').omTree('uncheck',target);
-         */  
+         */
         uncheck: function(target) {
             this._toggleCheck($("#" + target.nid), true);
         },
-        
+
         // target equal le elem
         _toggleCheck: function(target, checked) {
-            var checkbox_item = target.find(">div.tree-checkbox"), self = this,
-            options = self.options,
-            onCheck = options.onCheck;
-            if(self.options.cascadeCheck) {
+            var checkbox_item = target.find(">div.tree-checkbox"),
+                self = this,
+                options = self.options,
+                onCheck = options.onCheck;
+            if (self.options.cascadeCheck) {
                 self._setChildCheckbox(target, !checked);
                 self._setParentCheckbox(target);
             }
-            if(checked) {
+            if (checked) {
                 checkbox_item
                     .removeClass("checkbox_part checkbox_full checkbox_checked");
-                options.onUncheck && this._trigger("onUncheck",null,this.findByNId(target.attr("id")));
+                options.onUncheck && this._trigger("onUncheck", null, this.findByNId(target.attr("id")));
             } else {
                 checkbox_item
                     .removeClass("checkbox_part")
                     .addClass("checkbox_full checkbox_checked");
-                options.onCheck && this._trigger("onCheck",null,this.findByNId(target.attr("id")));
+                options.onCheck && this._trigger("onCheck", null, this.findByNId(target.attr("id")));
             }
         },
         /**
@@ -17607,9 +17616,9 @@ $.omWidget("om.omProgressbar", {
          * @example
          * //将所有节点的勾选框都设置为被勾选状态
          * $('#myTree').omTree('checkAll',true);
-         */  
+         */
         checkAll: function(checked) {
-            if(checked) {
+            if (checked) {
                 this.element
                     .find(".tree-checkbox")
                     .removeClass("checkbox_part")
@@ -17630,11 +17639,11 @@ $.omWidget("om.omProgressbar", {
          * //判断target节点的勾选状态
          * var target = $('#myTree').omTree("findNode", "text", "node1");
          * $('#myTree').omTree('isCheck',target);
-         */  
+         */
         isCheck: function(target) {
-            return $("#"+target.nid)
-                       .find(">div.tree-checkbox")
-                       .hasClass("checkbox_full");
+            return $("#" + target.nid)
+                .find(">div.tree-checkbox")
+                .hasClass("checkbox_full");
         },
         /**
          * 获取所有被勾选或未被勾选节点的JSON数据对象集合。
@@ -17645,25 +17654,25 @@ $.omWidget("om.omProgressbar", {
          * @example
          * //获取所有被勾选节点的JSON数据对象集合
          * $('#myTree').omTree('getChecked',true);
-         */      
+         */
         getChecked: function(checked) {
             var self = this,
-            	//_nodes={},
+                //_nodes={},
                 nodes = [];
-            var filter_config = checked?".checkbox_checked":":not(.checkbox_checked)";
+            var filter_config = checked ? ".checkbox_checked" : ":not(.checkbox_checked)";
             self.element
                 .find("li>div.tree-checkbox")
-                .each(function(i,name){
-                	if($(this).hasClass('checkbox_checked')){
-	                	node = self.element.data("nodes")[$(this).parent().attr("id")]
-						nodes.push(node);
-                	}
-                	//console.log($(this).next().children().text());
-                	//_nodes[$(this).parent().attr("id")]=self.element.data("nodes")[$(this).parent().attr("id")];
+                .each(function(i, name) {
+                    if ($(this).hasClass('checkbox_checked')) {
+                        node = self.element.data("nodes")[$(this).parent().attr("id")]
+                        nodes.push(node);
+                    }
+                    //console.log($(this).next().children().text());
+                    //_nodes[$(this).parent().attr("id")]=self.element.data("nodes")[$(this).parent().attr("id")];
                 });
-/*            $.each(_nodes,function(i,n){
-            	nodes.push(n);
-            });*/
+            /*            $.each(_nodes,function(i,n){
+                            nodes.push(n);
+                        });*/
             return nodes;
         },
         /**
@@ -17675,13 +17684,13 @@ $.omWidget("om.omProgressbar", {
          * //将target节点设置为选中状态
          * var target = $('#myTree').omTree("findNode", "text", "node1");
          * $('#myTree').omTree('select',target);
-         */  
+         */
         select: function(target) {
             var self = this,
                 options = this.options,
                 onBeforeSelect = options.onBeforeSelect,
                 onSelect = options.onSelect;
-            if(onBeforeSelect && false === self._trigger("onBeforeSelect",null,target)) {
+            if (onBeforeSelect && false === self._trigger("onBeforeSelect", null, target)) {
                 return self;
             }
             var node = $("#" + target.nid);
@@ -17690,12 +17699,12 @@ $.omWidget("om.omProgressbar", {
             $(" >span", node).addClass("selected");
             var oldSelected = self.element.data("selected");
             var curSelected = node.attr("id");
-            if(oldSelected != "" && !(oldSelected == curSelected)) {
+            if (oldSelected != "" && !(oldSelected == curSelected)) {
                 //$("#" + oldSelected + " >span >a").removeClass("selected");
                 $("#" + oldSelected + " >span").removeClass("selected");
             }
             self.element.data("selected", curSelected);
-            onSelect && self._trigger("onSelect",null,target);
+            onSelect && self._trigger("onSelect", null, target);
         },
         /**
          * 将指定节点设置为未选中状态。
@@ -17714,7 +17723,7 @@ $.omWidget("om.omProgressbar", {
             $(" >span", node).removeClass("selected");
             var oldSelected = this.element.data("selected");
             var curSelected = node.attr("id");
-            if( oldSelected == curSelected) {
+            if (oldSelected == curSelected) {
                 this.element.data("selected", "");
             }
         },
@@ -17731,7 +17740,7 @@ $.omWidget("om.omProgressbar", {
             var selected = this.element.data("selected");
             return selected ? this.element.data("nodes")[selected] : null;
         },
-        
+
         /* -------------------- find node ------------------- */
         /**
          * 根据节点数据的属性精确查找节点 pNode 下面的子节点中的 JSON 数据对象集合。
@@ -17747,14 +17756,15 @@ $.omWidget("om.omProgressbar", {
          * $('#myTree').omTree('findNodes', "classes", 'folder', "",true);
          */
         findNodes: function(key, value, pNode, deep) {
-            var result = [], len;
-            var data = pNode ? pNode.children :this.element.data("init_dataSource");
-            deep = (deep!=false)? true : deep;
-            if(data && (len = data.length) > 0) {
-                for(var i = 0; i < len; i++){
-                  result = this._searchNode.apply(data[i], [key, value, this._searchNode, result, false, deep]);
+            var result = [],
+                len;
+            var data = pNode ? pNode.children : this.element.data("init_dataSource");
+            deep = (deep != false) ? true : deep;
+            if (data && (len = data.length) > 0) {
+                for (var i = 0; i < len; i++) {
+                    result = this._searchNode.apply(data[i], [key, value, this._searchNode, result, false, deep]);
                 }
-           }
+            }
             return result.length > 0 ? result : null;
         },
         /**
@@ -17771,17 +17781,17 @@ $.omWidget("om.omProgressbar", {
          * //查找所有树节点中第一个满足属性“classes”等于“folder”的节点
          * $('#myTree').omTree('findNode', "classes", 'folder', "",true);
          */
-        findNode: function(key, value, pNode, deep){
+        findNode: function(key, value, pNode, deep) {
             var res, len, data = pNode ? pNode.children : this.element.data("init_dataSource");
-            deep = (deep!=false)? true : deep;
-            if(data && (len = data.length)> 0) {
-                for(var i = 0; i < len; i++){
-                  res = this._searchNode.apply(data[i], [key, value, this._searchNode, [], true, deep]);
-                  if(res != null){
-                      return res;
-                  }
-               }
-           }
+            deep = (deep != false) ? true : deep;
+            if (data && (len = data.length) > 0) {
+                for (var i = 0; i < len; i++) {
+                    res = this._searchNode.apply(data[i], [key, value, this._searchNode, [], true, deep]);
+                    if (res != null) {
+                        return res;
+                    }
+                }
+            }
             return null;
         },
         /**
@@ -17794,8 +17804,8 @@ $.omWidget("om.omProgressbar", {
          * //查找“nid”等于“treeId_4”的节点
          * $('#myTree').omTree('findByNId','treeId_4');
          */
-        findByNId : function(nid) {
-            return this.element.data("nodes")[nid]||null;
+        findByNId: function(nid) {
+            return this.element.data("nodes")[nid] || null;
         },
         /**
          * 根据指定函数fn精确查找指定pNode的子节点中满足条件的JSON数据对象集合，函数fn中可以定义复杂的查询逻辑。
@@ -17809,22 +17819,22 @@ $.omWidget("om.omProgressbar", {
          * //根据函数fn查找符合条件的所有节点的JSON数据对象集合
          * $('#myTree').omTree('findNodesBy',fn);
          */
-        findNodesBy: function(fn, pNode, deep){
+        findNodesBy: function(fn, pNode, deep) {
             var res, data = pNode ? pNode.children : this.element.data("init_dataSource");
-            deep = (deep!=false)? true : deep;
+            deep = (deep != false) ? true : deep;
             var result = [];
-            if(data && (len = data.length)> 0) {
-             for(var i = 0; i < len; i++){
-                if(fn.call(data[i], data[i]) === true){
-                    result.push(data[i]);
-                }
-                if(deep && data[i].children){
-                    res = this.findNodesBy(fn, data[i], deep);
-                    if(res){
-                        result = result.concat(res);
+            if (data && (len = data.length) > 0) {
+                for (var i = 0; i < len; i++) {
+                    if (fn.call(data[i], data[i]) === true) {
+                        result.push(data[i]);
+                    }
+                    if (deep && data[i].children) {
+                        res = this.findNodesBy(fn, data[i], deep);
+                        if (res) {
+                            result = result.concat(res);
+                        }
                     }
                 }
-              }
             }
             return result.length > 0 ? result : null;
         },
@@ -17840,41 +17850,41 @@ $.omWidget("om.omProgressbar", {
          * @example
          * //根据函数fn查找符合条件的第一个子节点的JSON数据对象
          * $('#myTree').omTree('findNodeBy',fn);
-         */       
-        findNodeBy: function(fn, pNode, deep){
+         */
+        findNodeBy: function(fn, pNode, deep) {
             var res, data = pNode ? pNode.children : this.element.data("init_dataSource");
-            deep = (deep!=false)? true : deep;
-            if(data && (len = data.length)> 0) {
-              for(var i = 0, len = data.length; i < len; i++){
-                if(fn.call(data[i], data[i]) === true){
-                    return data[i];
-                }
-                if(deep){
-                    res = this.findNodeBy(fn, data[i], deep);
-                    if(res != null){
-                        return res;
+            deep = (deep != false) ? true : deep;
+            if (data && (len = data.length) > 0) {
+                for (var i = 0, len = data.length; i < len; i++) {
+                    if (fn.call(data[i], data[i]) === true) {
+                        return data[i];
+                    }
+                    if (deep) {
+                        res = this.findNodeBy(fn, data[i], deep);
+                        if (res != null) {
+                            return res;
+                        }
                     }
                 }
-              }
             }
             return null;
-         },
-         
+        },
+
         _searchNode: function(key, value, _searchNode, result, isSingle, deep) {
-            if(isSingle){
-                if(this[key] == value)
-                return this;
-                if(this.children && this.children.length && deep) {
-                    for(var i in this.children){
-                        var temp=_searchNode.apply(this.children[i],[key,value,_searchNode,[],true, deep]);
-                        if(temp) return temp;
+            if (isSingle) {
+                if (this[key] == value)
+                    return this;
+                if (this.children && this.children.length && deep) {
+                    for (var i in this.children) {
+                        var temp = _searchNode.apply(this.children[i], [key, value, _searchNode, [], true, deep]);
+                        if (temp) return temp;
                     }
                 }
-            }else{
-                if(this[key] == value){      
+            } else {
+                if (this[key] == value) {
                     result.push(this);
                 }
-                if(this.children && this.children.length && deep) {
+                if (this.children && this.children.length && deep) {
                     $.each(this.children, _searchNode, [key, value, _searchNode, result, false, deep]);
                 }
                 return result;
@@ -17890,10 +17900,10 @@ $.omWidget("om.omProgressbar", {
          * //查找target的父节点的JSON数据对象
          * var target = $('#myTree').omTree("findNode", "text", "node1");
          * $('#myTree').omTree('getParent',target);
-         */  
+         */
         getParent: function(target) {
             var pid = this.element.data("nodes")["pid" + target.nid];
-            return pid?this.findByNId(pid):null;
+            return pid ? this.findByNId(pid) : null;
         },
         /**
          * 获取指定节点的所有子节点的JSON数据对象集合。
@@ -17905,7 +17915,7 @@ $.omWidget("om.omProgressbar", {
          * //查找target的父节点的JSON数据对象
          * var target = $('#myTree').omTree("findNode", "text", "node1");
          * $('#myTree').omTree('getChildren',target);
-         */      
+         */
         getChildren: function(target) {
             return target.children;
         },
@@ -17947,21 +17957,21 @@ $.omWidget("om.omProgressbar", {
          * @example
          * //将target节点展开
          * $('#myTree').omTree('expand',target);
-         */  
+         */
         expand: function(target) {
-            if(target.nid) {
-                var filter = CLASSES.expandable, 
+            if (target.nid) {
+                var filter = CLASSES.expandable,
                     node = $("#" + target.nid);
-                
-                var targetNodes = $(">div." + CLASSES.hitarea, node).filter(function(){
-                        return filter ? $(this).parent("." + filter).length : true;
-                    }).parent().parentsUntil(this.element).andSelf().filter(function() {
-                        return $(this).filter("li").hasClass(filter);
-                    });
+
+                var targetNodes = $(">div." + CLASSES.hitarea, node).filter(function() {
+                    return filter ? $(this).parent("." + filter).length : true;
+                }).parent().parentsUntil(this.element).andSelf().filter(function() {
+                    return $(this).filter("li").hasClass(filter);
+                });
                 this.toggler(targetNodes);
             }
         },
-        
+
         /**
          * 收缩指定节点。
          * @name omTree#collapse
@@ -17970,9 +17980,9 @@ $.omWidget("om.omProgressbar", {
          * @example
          * //将target节点收缩
          * $('#myTree').omTree('collapse',target);
-         */  
+         */
         collapse: function(target) {
-            if(target.nid) {
+            if (target.nid) {
                 this._collapseHandler(CLASSES.collapsable, $("#" + target.nid));
             }
         },
@@ -17983,7 +17993,7 @@ $.omWidget("om.omProgressbar", {
          * @example
          * //将所有的树节点展开
          * $('#myTree').omTree('expandAll');
-         */  
+         */
         expandAll: function() {
             this._collapseHandler(CLASSES.expandable, this.element, true);
         },
@@ -17998,16 +18008,16 @@ $.omWidget("om.omProgressbar", {
         collapseAll: function() {
             this._collapseHandler(CLASSES.collapsable, this.element, true);
         },
-        
+
         // filter: the class filter by the toggler
         // elem: from witch element
         _collapseHandler: function(filter, target, allPosterity) {
-            var condition = (allPosterity ? "" : ">") + "div." +  CLASSES.hitarea;
-            this.toggler( $(condition, target).filter(function(){
+            var condition = (allPosterity ? "" : ">") + "div." + CLASSES.hitarea;
+            this.toggler($(condition, target).filter(function() {
                 return filter ? $(this).parent("." + filter).length : true;
-            }).parent() );
+            }).parent());
         },
-        /* -------------------- edit node ------------------- */ 
+        /* -------------------- edit node ------------------- */
         /**
          * 刷新指定树节点及其子节点。
          * @name omTree#refresh
@@ -18017,118 +18027,124 @@ $.omWidget("om.omProgressbar", {
          * //刷新整棵树
          * $('#myTree').omTree('refresh');
          */
-        refresh: function( target ) {
-            var self = this, tree=self.element;
+        refresh: function(target) {
+            var self = this,
+                tree = self.element;
             var data = self.getData();
-            	if( !target ){
-            		tree.empty();
-            		if(typeof data == 'string'){
-                        self._ajaxLoad(tree, data);
-                    }else if(typeof data == 'object'){
-                       self.setData([]);
-            		   for(var i = 0, len = data.length; i < len; i ++ ) {
-            			  self.insert(data[i]);
-            		   }
-            	  }
-            	} else {
-            		var nextNode = $("#" + target.nid).next();
-            		var pid = tree.data("nodes")["pid" + target.nid];
-            		self.remove( target );
-            		self.insert(target, self.findByNId(pid),self.findByNId(nextNode.attr("id")));
-            	}
-            
+            if (!target) {
+                tree.empty();
+                if (typeof data == 'string') {
+                    self._ajaxLoad(tree, data);
+                } else if (typeof data == 'object') {
+                    self.setData([]);
+                    if (self.options.simpleDataModel == true) {
+                        data = self._transformToNodes(data);
+                    }
+                    for (var i = 0, len = data.length; i < len; i++) {
+                        self.insert(data[i]);
+                    }
+                }
+            } else {
+                var nextNode = $("#" + target.nid).next();
+                var pid = tree.data("nodes")["pid" + target.nid];
+                self.remove(target);
+                self.insert(target, self.findByNId(pid), self.findByNId(nextNode.attr("id")));
+            }
+
         },
-        
+
         // 简单数据模型转化为树状结构的数据
         _transformToNodes: function(data) {
-			var i,l;
-			if (!data) return [];
-			var r = [];
-			var tmpMap = [];
-			for (i=0, l=data.length; i<l; i++) {
-				tmpMap[data[i]["id"]] = data[i];
-			}
-			for (i=0, l=data.length; i<l; i++) {
-				if (tmpMap[data[i]["pid"]]) {
-					var pid = data[i]["pid"];
-					if (!tmpMap[pid]["children"])
-						tmpMap[pid]["children"] = [];
-					//delete data[i]["pid"];
-					tmpMap[pid]["children"].push(data[i]);
-				} else {
-					r.push(data[i]);
-				}
-			}
-			return r;
-		},
+            var i, l;
+            if (!data) return [];
+            var r = [];
+            var tmpMap = [];
+            for (i = 0, l = data.length; i < l; i++) {
+                tmpMap[data[i]["id"]] = data[i];
+            }
+            for (i = 0, l = data.length; i < l; i++) {
+                if (tmpMap[data[i]["pid"]]) {
+                    var pid = data[i]["pid"];
+                    if (!tmpMap[pid]["children"])
+                        tmpMap[pid]["children"] = [];
+                    //delete data[i]["pid"];
+                    tmpMap[pid]["children"].push(data[i]);
+                } else {
+                    r.push(data[i]);
+                }
+            }
+            return r;
+        },
         _appendNodes: function(target, nodes, bNode, isDrop) {
-            var self = this, ht=[];
+            var self = this,
+                ht = [];
             var checkable = self.options.showCheckbox;
-            var treeid=self.element.attr("id")?self.element.attr("id"):("treeId"+parseInt(Math.random()*1000));
-            self.element.attr("id",treeid);
-            for(var i = 0, l = nodes.length; i < l; i++){
-                var node = nodes[i], isLastNode = (i == (nodes.length - 1));
-                var nodeClass = "om-tree-node " + (checkable?"treenode-checkable ":"")+(node.hasChildren ? "hasChildren ":"");
-                var nid=treeid+"_"+(++self.options.nodeCount);
-                node.nid=nid;
+            var treeid = self.element.attr("id") ? self.element.attr("id") : ("treeId" + parseInt(Math.random() * 1000));
+            self.element.attr("id", treeid);
+            for (var i = 0, l = nodes.length; i < l; i++) {
+                var node = nodes[i],
+                    isLastNode = (i == (nodes.length - 1));
+                var nodeClass = "om-tree-node " + (checkable ? "treenode-checkable " : "") + (node.hasChildren ? "hasChildren " : "");
+                var nid = treeid + "_" + (++self.options.nodeCount);
+                node.nid = nid;
                 var caches = self.element.data("nodes");
                 caches[node.nid] = node;
-                if(typeof target == "string"){
-                    caches["pid"+node.nid] = target;
-                    if(isLastNode){
+                if (typeof target == "string") {
+                    caches["pid" + node.nid] = target;
+                    if (isLastNode) {
                         target = null;
                     }
-                }else{
-                    caches["pid"+node.nid] = target.parent("li").attr("id");
+                } else {
+                    caches["pid" + node.nid] = target.parent("li").attr("id");
                 }
                 var childHtml = [];
-                if(node.children && node.children.length > 0){
+                if (node.children && node.children.length > 0) {
                     childHtml.push((self._appendNodes(node.nid, node.children)).join(""));
                 }
                 var len = 0;
-                if (node.children && (len=node.children.length)>0||node.hasChildren) {
-                    if(node.expanded){
-                        nodeClass=nodeClass+"open "+CLASSES.collapsable+" "+(isLastNode ? CLASSES.lastCollapsable:"");
-                    }else{
-                        nodeClass=nodeClass+CLASSES.expandable+" "+(isLastNode ? CLASSES.lastExpandable:"");
+                if (node.children && (len = node.children.length) > 0 || node.hasChildren) {
+                    if (node.expanded) {
+                        nodeClass = nodeClass + "open " + CLASSES.collapsable + " " + (isLastNode ? CLASSES.lastCollapsable : "");
+                    } else {
+                        nodeClass = nodeClass + CLASSES.expandable + " " + (isLastNode ? CLASSES.lastExpandable : "");
                     }
-                }else{
-                    nodeClass=nodeClass+(isLastNode ? CLASSES.last:"");
+                } else {
+                    nodeClass = nodeClass + (isLastNode ? CLASSES.last : "");
                 }
-                ht.push("<li id='", node.nid, "' class='" ,nodeClass ,"'>");
-                if(node.hasChildren || len >0){
-                	var classes = "";
+                ht.push("<li id='", node.nid, "' class='", nodeClass, "'>");
+                if (node.hasChildren || len > 0) {
+                    var classes = "";
                     $.each(nodeClass.split(" "), function() {
                         classes += this + "-hitarea ";
                     });
-                	ht.push("<div class='", CLASSES.hitarea +" "+classes, "'/>");
+                    ht.push("<div class='", CLASSES.hitarea + " " + classes, "'/>");
                 }
-                if(checkable){
+                if (checkable) {
                     ht.push("<div class='tree-checkbox'/>");
                 }
-                var spanClass = (node.classes?node.classes:"");
-                if(self.options.showIcon){
-                    if(node.hasChildren || node.children && node.children.length>0){
+                var spanClass = (node.classes ? node.classes : "");
+                if (self.options.showIcon) {
+                    if (node.hasChildren || node.children && node.children.length > 0) {
                         spanClass = spanClass + " folder ";
-                    }else{
+                    } else {
                         spanClass = spanClass + " file ";
-                    }    
+                    }
                 }
                 ht.push("<span class='", spanClass, "'>", "<a href='#'>", node.text, "</a></span>");
-                if (node.hasChildren || len>0) {
-                    ht.push("<ul", " style='display:", (node.expanded ? "block": "none"),"'>");
+                if (node.hasChildren || len > 0) {
+                    ht.push("<ul", " style='display:", (node.expanded ? "block" : "none"), "'>");
                     ht.push(childHtml.join(''));
                     ht.push("</ul>");
                 }
                 ht.push("</li>");
             }
-            if(bNode){
-                if(isDrop){
-                    $("#"+bNode.nid).after(ht.join(""));
-                }else{
-                    $("#"+bNode.nid).before(ht.join(""));
+            if (bNode) {
+                if (isDrop) {
+                    $("#" + bNode.nid).after(ht.join(""));
+                } else {
+                    $("#" + bNode.nid).before(ht.join(""));
                 }
-            }else if(target){
+            } else if (target) {
                 target.append(ht.join(""));
             }
             return ht;
@@ -18143,54 +18159,55 @@ $.omWidget("om.omProgressbar", {
          * //删除树种对应JSON数据对象为target的节点
          * var target = $('#myTree').omTree("findNode", "text", "node1");
          * $('#myTree').omTree('remove',target);
-         */  
+         */
         remove: function(target, pNode) {
-            var flag, self = this, data=pNode ? pNode.children : self.element.data("init_dataSource");
-            for(var i in data){
-                if(data[i] == target){
+            var flag, self = this,
+                data = pNode ? pNode.children : self.element.data("init_dataSource");
+            for (var i in data) {
+                if (data[i] == target) {
                     var ids = [];
                     ids = self._findChildrenId(target, ids);
                     ids.push(target.nid);
-                    for(var n = 0, len = ids.length; n < len ; n++){
+                    for (var n = 0, len = ids.length; n < len; n++) {
                         delete self.element.data("nodes")[ids[n]];
-                        delete self.element.data("nodes")["pid"+ids[n]];
+                        delete self.element.data("nodes")["pid" + ids[n]];
                     }
-                    if(target.nid == self.element.data("selected")){
-                        this.element.data("selected",null);
+                    if (target.nid == self.element.data("selected")) {
+                        this.element.data("selected", null);
                     }
-                    var pre = $("#"+target.nid).prev();
-                    if($("#"+target.nid).next().length<1 && pre.length > 0){
-                        if(pre.hasClass(CLASSES.collapsable)){
+                    var pre = $("#" + target.nid).prev();
+                    if ($("#" + target.nid).next().length < 1 && pre.length > 0) {
+                        if (pre.hasClass(CLASSES.collapsable)) {
                             pre.addClass(CLASSES.lastCollapsable);
                             pre.find("div.hitarea").first().addClass(CLASSES.lastCollapsableHitarea);
-                        }else if(pre.hasClass(CLASSES.expandable)){
+                        } else if (pre.hasClass(CLASSES.expandable)) {
                             pre.addClass(CLASSES.lastExpandable);
                             pre.find("div.hitarea").first().addClass(CLASSES.lastExpandableHitarea);
-                        }else{
+                        } else {
                             pre.addClass(CLASSES.last);
                         }
                     }
-                    $("#"+target.nid).remove();
+                    $("#" + target.nid).remove();
                     data.splice(i, 1);
-                    if(pNode&&pNode.nid&&data.length < 1){
-                    	self._changeToFolderOrFile(pNode,false);
+                    if (pNode && pNode.nid && data.length < 1) {
+                        self._changeToFolderOrFile(pNode, false);
                     }
                     return true;
-                }else if(data[i].children){
+                } else if (data[i].children) {
                     flag = self.remove(target, data[i]);
-                    if(flag){
+                    if (flag) {
                         return true;
                     }
                 }
             }
             return false;
         },
-        
-        _findChildrenId: function(target, ids){
-            if(target.children){
-                for(var i = 0, children = target.children, len = children.length; i < len; i++){
+
+        _findChildrenId: function(target, ids) {
+            if (target.children) {
+                for (var i = 0, children = target.children, len = children.length; i < len; i++) {
                     ids.push(children[i].nid);
-                    if(children[i].children){
+                    if (children[i].children) {
                         this._findChildrenId(children[i], ids);
                     }
                 }
@@ -18208,27 +18225,29 @@ $.omWidget("om.omProgressbar", {
          * //在pNode的子节点后插入对应JSON数据对象为target的节点
          * var target = $('#myTree').omTree("findNode", "text", "node1");
          * $('#myTree').omTree('insert',target，pNode);
-         */  
+         */
 
-        insert : function(target, pNode, bNode, isDrop) {
-        	if(!target){
-        		return;
-        	}
-            var self = this, nodes=[], parent, otherChildren, flag = $.isArray(target);
-            if(flag){
-            	nodes = target;
-            } else{
-            	nodes.push(target);
+        insert: function(target, pNode, bNode, isDrop) {
+            if (!target) {
+                return;
             }
-            if (bNode) { 
+            var self = this,
+                nodes = [],
+                parent, otherChildren, flag = $.isArray(target);
+            if (flag) {
+                nodes = target;
+            } else {
+                nodes.push(target);
+            }
+            if (bNode) {
                 pNode = pNode || self.findByNId(self.element.data("nodes")["pid" + bNode.nid]);
             }
             var index, data = pNode ? pNode.children : self.element.data("init_dataSource");
-            if (pNode && (!pNode.children||pNode.children.length<1)) {
-            	if(!pNode.hasChildren){           		
-            		self._changeToFolderOrFile(pNode,true);
-            		self._bindHitEvent($("#" + pNode.nid));
-            	}
+            if (pNode && (!pNode.children || pNode.children.length < 1)) {
+                if (!pNode.hasChildren) {
+                    self._changeToFolderOrFile(pNode, true);
+                    self._bindHitEvent($("#" + pNode.nid));
+                }
                 data = pNode.children = [];
             }
             parent = pNode ? $("#" + pNode.nid).children("ul").first() : self.element;
@@ -18238,50 +18257,51 @@ $.omWidget("om.omProgressbar", {
                 data.splice(index, 0, target);
             } else {
                 self._appendNodes(parent, nodes, bNode, isDrop);
-                if(flag){
-                    $.merge(data, target);             
-                }else{
-                	data.push(target);
+                if (flag) {
+                    $.merge(data, target);
+                } else {
+                    data.push(target);
                 }
             }
             var m = parent.find("li")
-                        .filter("." + CLASSES.last + ",." + CLASSES.lastCollapsable+",."+CLASSES.lastExpandable)
-                        .not(parent.find("li")
-                        .filter(":last-child:not(ul)"));
+                .filter("." + CLASSES.last + ",." + CLASSES.lastCollapsable + ",." + CLASSES.lastExpandable)
+                .not(parent.find("li")
+                    .filter(":last-child:not(ul)"));
             m.removeClass(CLASSES.last + " " + CLASSES.lastCollapsable + " " + CLASSES.lastExpandable);
-            m.find(" >div").removeClass(CLASSES.lastCollapsableHitarea+" "+CLASSES.lastExpandableHitarea);
-            var tdom = parent.find("li").not(otherChildren);                        
+            m.find(" >div").removeClass(CLASSES.lastCollapsableHitarea + " " + CLASSES.lastExpandableHitarea);
+            var tdom = parent.find("li").not(otherChildren);
             self._applyEvents(tdom);
         },
-        
-        _changeToFolderOrFile: function(node,isToFolder){
-        	var nDom = $("#" + node.nid),self=this;
-        	if(isToFolder){
-        		var parent = $("<ul/>").css("display",  "block").appendTo(nDom);
-        		nDom.addClass("open "+CLASSES.collapsable);
-        		self._swapClass(nDom, CLASSES.last, CLASSES.lastCollapsable);
-        		node.children = [];
-        	}else{
-        		nDom.find("ul").remove();
-        		nDom.find("div."+CLASSES.hitarea).remove();
-        		nDom.filter("."+CLASSES.lastCollapsable+",."+CLASSES.lastExpandable)
-        		.removeClass(CLASSES.lastCollapsable+" "+CLASSES.lastExpandable).addClass(CLASSES.last);
-        		nDom.removeClass("open "+CLASSES.collapsable+" "+CLASSES.expandable);
-        	}
-            if(self.options.showIcon) {
-                self._swapClass(nDom.children("span"),"file","folder");
+
+        _changeToFolderOrFile: function(node, isToFolder) {
+            var nDom = $("#" + node.nid),
+                self = this;
+            if (isToFolder) {
+                var parent = $("<ul/>").css("display", "block").appendTo(nDom);
+                nDom.addClass("open " + CLASSES.collapsable);
+                self._swapClass(nDom, CLASSES.last, CLASSES.lastCollapsable);
+                node.children = [];
+            } else {
+                nDom.find("ul").remove();
+                nDom.find("div." + CLASSES.hitarea).remove();
+                nDom.filter("." + CLASSES.lastCollapsable + ",." + CLASSES.lastExpandable)
+                    .removeClass(CLASSES.lastCollapsable + " " + CLASSES.lastExpandable).addClass(CLASSES.last);
+                nDom.removeClass("open " + CLASSES.collapsable + " " + CLASSES.expandable);
             }
-        	var hitarea = nDom.filter(":has(>ul)").prepend("<div class=\"" + CLASSES.hitarea + "\"/>").find("div." + CLASSES.hitarea);
+            if (self.options.showIcon) {
+                self._swapClass(nDom.children("span"), "file", "folder");
+            }
+            var hitarea = nDom.filter(":has(>ul)").prepend("<div class=\"" + CLASSES.hitarea + "\"/>").find("div." + CLASSES.hitarea);
             hitarea.each(function() {
                 var classes = "";
                 $.each($(this).parent().attr("class").split(" "), function() {
                     classes += this + "-hitarea ";
                 });
-                $(this).addClass( classes );
+                $(this).addClass(classes);
             });
         },
-        
-        
+
+
         /**
          * 在指定pNode的子节点中将JSON数据对象为target的节点修改其JSON数据对象为newNode。
          * @name omTree#modify
@@ -18294,25 +18314,27 @@ $.omWidget("om.omProgressbar", {
          * var target = $('#myTree').omTree("findNode", "text", "node1");
          * var newNode ={text: "node5"};
          * $('#myTree').omTree('insert',target，newNode);
-         */  
+         */
         modify: function(target, newNode, pNode) {
-        	if(target&&newNode){
-        		var self = this, nextNode = $("#" + target.nid).next(), bNode = null;
+            if (target && newNode) {
+                var self = this,
+                    nextNode = $("#" + target.nid).next(),
+                    bNode = null;
                 pNode = pNode || this.findByNId(self.element.data("nodes")["pid" + target.nid]);
-                if(nextNode.is("ul") || nextNode.is("li"))
+                if (nextNode.is("ul") || nextNode.is("li"))
                     bNode = self.findByNId(nextNode.attr("id"));
                 self.remove(target, pNode);
-                self.insert(newNode, pNode, bNode);	
-        	}
+                self.insert(newNode, pNode, bNode);
+            }
         },
         /* -------------------- disable and enable node ------------------- */
         disable: function() {
-            
+
         },
         enable: function() {
-            
+
         }
-        
+
         /**
          * 远程更新数据异常后执行的方法 .错误信息为jQuery.ajax返回的异常信息，可参考jQuery.ajax官方文档。
          * @event
@@ -18475,6 +18497,7 @@ $.omWidget("om.omProgressbar", {
          */
     });
 })(jQuery);
+
 /*
  * $Id: om-validate.js,v 1.7 2012/06/04 03:03:11 linxiaomin Exp $
  * operamasks-ui validate 2.1

@@ -236,6 +236,10 @@
              * $('.selector').omGrid({limit : 15});
              */
             limit:15,
+            /*
+             * 是否显示分页             
+             */
+            showPagination:true,
             /**
              * 显示在分页条上“上一页”和“下一页”按钮之间的文字。在显示时其中的{totalPage}会被替换为总页数，{index}会被替换为一个输入框（默认显示当前的页号，用户可以输入任意数字然后回车来跳转到指定的页）。
              * @name omGrid#pageText
