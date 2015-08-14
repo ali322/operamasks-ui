@@ -1279,6 +1279,15 @@
             });
             self._refreshHeaderCheckBox();
         },
+        setSelectionsWithRecords:function(callback){
+            var rowsData = self.getData().rows,selectedIndexes = [];
+            $.each(rowData,function(k,row){
+                if(callback(row) == true){
+                    selectedIndexes.push(k);
+                }
+            });
+            this.setSelections(selectedIndexes);
+        },
         /**
          * 获取选择的行的行号或行记录。<b>注意：默认返回的是行序号组成的数组（如选择了第2行和第5行则返回[1,4]），如果要返回行记录JSON组成的数组需要传入一个true作为参数</b>。
          * @name omGrid#getSelections
