@@ -17603,10 +17603,6 @@ $.omWidget("om.omProgressbar", {
                 self = this,
                 options = self.options,
                 onCheck = options.onCheck;
-            if (self.options.cascadeCheck) {
-                self._setChildCheckbox(target, !checked);
-                self._setParentCheckbox(target);
-            }
             if (checked) {
                 checkbox_item
                     .removeClass("checkbox_part checkbox_full checkbox_checked");
@@ -17616,6 +17612,10 @@ $.omWidget("om.omProgressbar", {
                     .removeClass("checkbox_part")
                     .addClass("checkbox_full checkbox_checked");
                 options.onCheck && this._trigger("onCheck", null, this.findByNId(target.attr("id")));
+            }
+            if (self.options.cascadeCheck) {
+                self._setChildCheckbox(target, !checked);
+                self._setParentCheckbox(target);
             }
         },
         /**
