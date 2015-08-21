@@ -17202,18 +17202,19 @@ $.omWidget("om.omProgressbar", {
             return null;
         },
 
-        _setParentCheckbox: function(node) {
+        _setParentCheckbox: function (node){
             var pnode = this._getParentNode(node);
-            if (pnode) {
+            if (pnode){
                 var checkbox = pnode.find(">ul >li >div.tree-checkbox");
                 var allChild = checkbox.length;
-                var full_len = checkbox.filter(".checkbox_full").length;
-                var part_len = checkbox.filter(".checkbox_part").length;
+                var checked_len = checkbox.filter(".checkbox_checked").length;
+                //var part_len = checkbox.filter(".checkbox_part").length;
                 var pnode_checkbox = pnode.find(">div.tree-checkbox");
                 pnode_checkbox.removeClass("checkbox_full checkbox_part checkbox_checked");
-                if (full_len == allChild) {
+                //console.log(full_len,part_len);
+                if(checked_len == allChild) {
                     pnode_checkbox.addClass("checkbox_full checkbox_checked");
-                } else if (full_len > 0 || part_len > 0) {
+                } else if(checked_len > 0) {
                     pnode_checkbox.addClass("checkbox_part checkbox_checked");
                 }
                 this._setParentCheckbox(pnode);
